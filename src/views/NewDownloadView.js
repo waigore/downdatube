@@ -1,6 +1,10 @@
 import React, { Component } from 'react';
 import { Route, Redirect } from 'react-router-dom';
 import { Button, Form, FormGroup, Label, Input, FormText } from 'reactstrap';
+import {bindActionCreators} from 'redux';
+import {connect} from 'react-redux';
+
+import { newDownload, createNewDownload } from '../actions';
 
 class NewDownloadView extends Component {
 
@@ -17,14 +21,13 @@ class NewDownloadView extends Component {
   }
 
   saveAndAddAnother() {
-    //this.refs.videoUrl.value = '';
-    //console.log(this.refs.url.getValue());
+    this.props.createNewDownload(this.state.url);
     this.setState({url: ""});
   }
 
   save() {
-    console.log("Yes");
-    this.setState({goBack: true});
+    this.props.newDownload(this.state.url);
+    this.setState({url:"", goBack: true});
   }
 
   updateUrl(evt) {
@@ -57,4 +60,10 @@ class NewDownloadView extends Component {
   }
 }
 
-export default NewDownloadView;
+function mapDispatchToProps(dispatch) {
+    return bindActionCreators({
+      createNewDownload
+    }, dispatch);
+}
+
+export default connect(null, mapDispatchToProps)(NewDownloadView);

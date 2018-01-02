@@ -7,6 +7,7 @@ import {
   requestDownloads,
   receiveDownloads,
   receiveDownloadProgress,
+  downloadFinished,
   fetchDownloads
 } from '../actions';
 
@@ -33,8 +34,8 @@ class DownloadEntryTable extends React.Component {
         return 'Queued';
       case 'DOWNLOADING':
         return 'Downloading';
-      case 'COMPLETED':
-        return 'Completed';
+      case 'FINISHED':
+        return 'Finished';
       default:
         return s;
     }
@@ -49,6 +50,9 @@ class DownloadEntryTable extends React.Component {
         break;
       case 'DOWNLOAD_PROGRESS':
         this.props.receiveDownloadProgress(dlData);
+        break;
+      case 'DOWNLOAD_FINISHED':
+        this.props.downloadFinished(dlData);
         break;
     }
   }
@@ -131,6 +135,7 @@ function mapDispatchToProps(dispatch) {
       requestDownloads,
       receiveDownloads,
       receiveDownloadProgress,
+      downloadFinished,
       fetchDownloads
     }, dispatch);
 }
