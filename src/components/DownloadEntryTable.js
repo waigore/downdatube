@@ -66,7 +66,7 @@ class DownloadEntryTable extends React.Component {
         );
       case 'DOWNLOADING':
         return (
-          <Progress animated value={downloadEntry.status_pct}>{this.formatDownloadPct(downloadEntry.status_pct)}</Progress>
+          <Progress animated value={downloadEntry.status_pct}></Progress>
         );
       default:
         return (
@@ -84,12 +84,6 @@ class DownloadEntryTable extends React.Component {
           <td>{downloadEntry.id}</td>
           <td>{downloadEntry.name || '???'}</td>
           <td>{this.renderStatus(downloadEntry)}</td>
-          <td>
-            <div>
-              <Button color="warning">Pause</Button>
-              <Button color="danger">Remove</Button>
-            </div>
-          </td>
         </tr>
       );
     });
@@ -110,7 +104,6 @@ class DownloadEntryTable extends React.Component {
               <th>ID</th>
               <th>Name</th>
               <th>Status</th>
-              <th></th>
             </tr>
           </thead>
           <tbody>
