@@ -15,8 +15,19 @@ let WS_ENDPOINT = 'ws://localhost:5000/';
 
 class DownloadEntryTable extends React.Component {
 
+  constructor(props) {
+    super(props);
+  }
+
   componentDidMount() {
-    this.props.fetchDownloads();
+    this.props.fetchDownloads(this.props.byStatus);
+  }
+
+  componentWillReceiveProps(nextProps) {
+    console.log(nextProps);
+    if (nextProps.byStatus && this.props.byStatus !== nextProps.byStatus) {
+      nextProps.fetchDownloads(nextProps.byStatus);
+    }
   }
 
   componentWillUnmount() {
@@ -110,8 +121,6 @@ class DownloadEntryTable extends React.Component {
             {this.renderDownloads()}
           </tbody>
         </Table>
-        <Websocket url={WS_ENDPOINT}
-              onMessage={this.handleWSData.bind(this)}/>
       </div>
     );
   }

@@ -20,13 +20,13 @@ class App extends Component {
         <Container fluid>
             <Switch>
               <Route exact path="/all" render={() =>
-                <MainView viewType="ALL" />
+                <MainView viewType="all" />
               }/>
               <Route exact path="/downloading" render={() =>
-                <MainView viewType="DOWNLOADING" />
+                <MainView viewType="downloading" />
               }/>
-              <Route exact path="/completed" render={() =>
-                <MainView viewType="COMPLETED" />
+              <Route exact path="/finished" render={() =>
+                <MainView viewType="finished" />
               }/>
               <Route exact path="/new" component={NewDownloadView} />
               <Redirect from="/" to="/all"/>

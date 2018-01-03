@@ -16,7 +16,7 @@ export default class AppActionBar extends React.Component {
         <ButtonGroup className="float-left">
           <Button><Link style={{ textDecoration: 'none', color: 'black'}} to="/all">All</Link></Button>{' '}
           <Button><Link style={{ textDecoration: 'none', color: 'black'}} to="/downloading">Downloading</Link></Button>{' '}
-          <Button><Link style={{ textDecoration: 'none', color: 'black' }} to="/completed">Completed</Link></Button>
+          <Button><Link style={{ textDecoration: 'none', color: 'black' }} to="/finished">Finished</Link></Button>
         </ButtonGroup>
         <Button color="primary" className="float-right"><Link style={{ textDecoration: 'none', color: 'white' }} to="/new">New</Link></Button>
       </div>

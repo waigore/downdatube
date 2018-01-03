@@ -72,11 +72,12 @@ export function createNewDownload(url) {
   }
 }
 
-export function fetchDownloads() {
+export function fetchDownloads(byStatus) {
   return (dispatch) => {
     dispatch(requestDownloads());
 
-    let apiUrl = `${API_ENDPOINT}/downloads/all`;
+    let apiUrl = `${API_ENDPOINT}/downloads/${byStatus}`;
+    console.log('apiUrl:', apiUrl);
     /*
     return fetch(apiUrl)
       .then(

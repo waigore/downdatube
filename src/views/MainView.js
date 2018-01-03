@@ -11,32 +11,32 @@ class MainView extends Component {
 
   renderView() {
     switch (this.props.viewType) {
-      case 'ALL':
+      case 'all':
       return (
         <div>
           <h3>All</h3>
-          <DownloadEntryTable />
+          <DownloadEntryTable byStatus="all" />
         </div>
       );
-      case 'DOWNLOADING':
+      case 'downloading':
       return (
         <div>
           <h3>Downloading</h3>
-          <DownloadEntryTable />
+          <DownloadEntryTable byStatus="downloading" />
         </div>
       );
-      case 'COMPLETED':
+      case 'finished':
       return (
         <div>
-          <h3>Completed</h3>
-          <DownloadEntryTable />
+          <h3>Finished</h3>
+          <DownloadEntryTable byStatus="finished" />
         </div>
       );
       default:
       return (
         <div>
           <h3>All</h3>
-          <DownloadEntryTable />
+          <DownloadEntryTable byStatus="all" />
         </div>
       );
     }
