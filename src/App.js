@@ -29,7 +29,7 @@ class App extends Component {
                 <MainView viewType="finished" />
               }/>
               <Route exact path="/new" component={NewDownloadView} />
-              <Redirect from="/" to="/all"/>
+              <Redirect from="/" to="/downloading"/>
             </Switch>
         </Container>
       </div>

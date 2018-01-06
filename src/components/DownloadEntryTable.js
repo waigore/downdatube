@@ -5,10 +5,8 @@ import {connect} from 'react-redux';
 import { Button, Col, Progress, Table } from 'reactstrap';
 import {
   requestDownloads,
-  receiveDownloads,
-  receiveDownloadProgress,
-  downloadFinished,
-  fetchDownloads
+  fetchDownloads,
+  fetchDownloadProgress
 } from '../actions';
 
 let WS_ENDPOINT = 'ws://localhost:5000/';
@@ -20,17 +18,35 @@ class DownloadEntryTable extends React.Component {
   }
 
   componentDidMount() {
+    console.log("Fetching download entries on mount")
     this.props.fetchDownloads(this.props.byStatus);
+    console.log("Setting download progress background timer");
+    this.timerId = setInterval(
+      () => {
+        if (!this.props.downloads) {
+          return;
+        }
+        let ids = this.props.downloads.items
+          .filter(entry => entry.status != 'FINISHED')
+          .map(entry => entry.id);
+        if (ids.length > 0) {
+          this.props.fetchDownloadProgress(ids);
+        }
+      },
+      2000
+    );
   }
 
   componentWillReceiveProps(nextProps) {
-    console.log(nextProps);
     if (nextProps.byStatus && this.props.byStatus !== nextProps.byStatus) {
+      console.log("Fetching download entries");
       nextProps.fetchDownloads(nextProps.byStatus);
     }
   }
 
   componentWillUnmount() {
+    console.log("Clearing download progress timer");
+    clearInterval(this.timerId);
   }
 
   formatDownloadPct(pct) {
@@ -49,22 +65,6 @@ class DownloadEntryTable extends React.Component {
         return 'Finished';
       default:
         return s;
-    }
-  }
-
-  handleWSData(data) {
-    let dlData = JSON.parse(data);
-    let msgType = dlData.msg;
-    switch(msgType) {
-      case 'ALL_DOWNLOADS':
-        this.props.receiveDownloads(dlData);
-        break;
-      case 'DOWNLOAD_PROGRESS':
-        this.props.receiveDownloadProgress(dlData);
-        break;
-      case 'DOWNLOAD_FINISHED':
-        this.props.downloadFinished(dlData);
-        break;
     }
   }
 
@@ -92,7 +92,7 @@ class DownloadEntryTable extends React.Component {
       return (
         <tr key={downloadEntry.id}>
           <th scope="row">{++i}</th>
-          <td>{downloadEntry.id}</td>
+          <td>{downloadEntry.uploader || '???'}</td>
           <td>{downloadEntry.name || '???'}</td>
           <td>{this.renderStatus(downloadEntry)}</td>
         </tr>
@@ -106,13 +106,18 @@ class DownloadEntryTable extends React.Component {
           <div>Loading...</div>
       );
     }
+    else if (this.props.downloads.items.length == 0) {
+      return (
+        <div>{"Nothing here. Click 'New' to start downing some Tube!"}</div>
+      );
+    }
     return (
       <div>
         <Table>
           <thead>
             <tr>
               <th>#</th>
-              <th>ID</th>
+              <th>Uploader</th>
               <th>Name</th>
               <th>Status</th>
             </tr>
@@ -135,10 +140,8 @@ function mapStateToProps(state) {
 function mapDispatchToProps(dispatch) {
     return bindActionCreators({
       requestDownloads,
-      receiveDownloads,
-      receiveDownloadProgress,
-      downloadFinished,
-      fetchDownloads
+      fetchDownloads,
+      fetchDownloadProgress
     }, dispatch);
 }
 

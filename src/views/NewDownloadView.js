@@ -26,7 +26,7 @@ class NewDownloadView extends Component {
   }
 
   save() {
-    this.props.newDownload(this.state.url);
+    this.props.createNewDownload(this.state.url);
     this.setState({url:"", goBack: true});
   }
 
@@ -39,7 +39,7 @@ class NewDownloadView extends Component {
   render() {
     if (this.state.goBack) {
       return (
-        <Redirect to="/all" />
+        <Redirect to="/downloading" />
       )
     }
     return (

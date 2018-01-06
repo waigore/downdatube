@@ -35,6 +35,14 @@ export function receiveDownloads(json) {
   }
 }
 
+export const REQUEST_DOWNLOAD_PROGRESS = 'REQUEST_DOWNLOAD_PROGRESS';
+export function requestDownloadProgress(ids) {
+  return {
+    type: REQUEST_DOWNLOAD_PROGRESS,
+    ids: ids
+  }
+}
+
 export const RECEIVE_DOWNLOAD_PROGRESS = 'RECEIVE_DOWNLOAD_PROGRESS';
 export function receiveDownloadProgress(json) {
   return {
@@ -44,20 +52,11 @@ export function receiveDownloadProgress(json) {
   }
 }
 
-export const DOWNLOAD_FINISHED = 'DOWNLOAD_FINISHED';
-export function downloadFinished(json) {
-  return {
-    type: DOWNLOAD_FINISHED,
-    data: json,
-    receiveAt: Date.now()
-  }
-}
-
 export function createNewDownload(url) {
   return (dispatch) => {
     dispatch(newDownload(url));
 
-    let apiUrl = `${API_ENDPOINT}/downloads/new`;
+    let apiUrl = `${API_ENDPOINT}/add_download`;
     return fetch(apiUrl, {
       method: "POST",
       headers: {
@@ -78,19 +77,30 @@ export function fetchDownloads(byStatus) {
 
     let apiUrl = `${API_ENDPOINT}/downloads/${byStatus}`;
     console.log('apiUrl:', apiUrl);
-    /*
-    return fetch(apiUrl)
-      .then(
-        response => response.json(),
-        error => console.log('An error occurred.', error)
-      )
-      .then(
-        json => dispatch(receiveDownloads(json))
-      );
-      */
+
     return fetch(apiUrl)
       .then(response => response.json())
       .then(json => dispatch(receiveDownloads(json)))
       .catch(error => console.log('An error occurred.', error));
+  }
+}
+
+export function fetchDownloadProgress(ids) {
+  return (dispatch) => {
+    dispatch(requestDownloadProgress(ids));
+
+    let apiUrl = `${API_ENDPOINT}/downloads/byIdList`;
+    console.log("ids:", ids);
+    return fetch(apiUrl, {
+      method: "POST",
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ids: ids})
+    })
+    .then(response => response.json())
+    .then(json => dispatch(receiveDownloadProgress(json)))
+    .catch(error => console.log('An error occurred.', error));
   }
 }
