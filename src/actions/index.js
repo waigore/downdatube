@@ -1,6 +1,6 @@
 //import fetch from 'cross-fetch';
 
-let API_ENDPOINT = 'http://localhost:5000/api';
+const API_ENDPOINT = 'http://localhost:5000/api';
 
 export const NEW_DOWNLOAD = 'NEW_DOWNLOAD';
 export function newDownload(url) {
@@ -10,12 +10,27 @@ export function newDownload(url) {
   }
 }
 
-export const DOWNLOAD_CREATED = 'DOWNLOAD_CREATED';
-export function downloadCreated(json) {
+export const NEW_DOWNLOAD_CREATED = 'NEW_DOWNLOAD_CREATED';
+export function newDownloadCreated(json) {
   return {
-    type: DOWNLOAD_CREATED,
+    type: NEW_DOWNLOAD_CREATED,
     data: json,
     receiveAt: Date.now()
+  }
+}
+
+export const NEW_DOWNLOAD_FAILED = 'NEW_DOWNLOAD_FAILED';
+export function newDownloadFailed(error) {
+  return {
+    type: NEW_DOWNLOAD_FAILED,
+    error: error
+  }
+}
+
+export const RESET_NEW_DOWNLOAD_VIEW_STATE = 'RESET_NEW_DOWNLOAD_VIEW_STATE';
+export function resetNewDownloadViewState() {
+  return {
+    type: RESET_NEW_DOWNLOAD_VIEW_STATE
   }
 }
 
@@ -26,10 +41,10 @@ export function requestDownloads() {
   }
 }
 
-export const RECEIVE_DOWNLOADS = 'RECEIVE_DOWNLOADS';
-export function receiveDownloads(json) {
+export const DOWNLOADS_RECEIVED = 'DOWNLOADS_RECEIVED';
+export function downloadsReceived(json) {
   return {
-    type: RECEIVE_DOWNLOADS,
+    type: DOWNLOADS_RECEIVED,
     data: json,
     receivedAt: Date.now()
   }
@@ -43,10 +58,10 @@ export function requestDownloadProgress(ids) {
   }
 }
 
-export const RECEIVE_DOWNLOAD_PROGRESS = 'RECEIVE_DOWNLOAD_PROGRESS';
-export function receiveDownloadProgress(json) {
+export const DOWNLOAD_PROGRESS_RECEIVED = 'DOWNLOAD_PROGRESS_RECEIVED';
+export function downloadProgressReceived(json) {
   return {
-    type: RECEIVE_DOWNLOAD_PROGRESS,
+    type: DOWNLOAD_PROGRESS_RECEIVED,
     data: json,
     receivedAt: Date.now()
   }
@@ -66,8 +81,11 @@ export function createNewDownload(url) {
       body: JSON.stringify({url})
     })
     .then(response => response.json())
-    .then(json => dispatch(downloadCreated(json)))
-    .catch(error => console.log('An error occurred.', error));
+    .then(json => dispatch(newDownloadCreated(json)))
+    .catch(error => {
+      console.log('An error occurred.', error),
+        dispatch(newDownloadFailed(error))
+    });
   }
 }
 
@@ -80,7 +98,7 @@ export function fetchDownloads(byStatus) {
 
     return fetch(apiUrl)
       .then(response => response.json())
-      .then(json => dispatch(receiveDownloads(json)))
+      .then(json => dispatch(downloadsReceived(json)))
       .catch(error => console.log('An error occurred.', error));
   }
 }
@@ -100,7 +118,7 @@ export function fetchDownloadProgress(ids) {
       body: JSON.stringify({ids: ids})
     })
     .then(response => response.json())
-    .then(json => dispatch(receiveDownloadProgress(json)))
+    .then(json => dispatch(downloadProgressReceived(json)))
     .catch(error => console.log('An error occurred.', error));
   }
 }

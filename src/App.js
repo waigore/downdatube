@@ -4,14 +4,43 @@ import {
   Col,
   Row,
 } from 'reactstrap';
-import {Switch, Route, Redirect} from 'react-router-dom';
+import {Switch, Route, Redirect, withRouter} from 'react-router-dom';
+import {bindActionCreators} from 'redux';
+import {connect} from 'react-redux';
 import AppNavbar from './components/AppNavbar';
 import AppActionBar from './components/AppActionBar';
 import MainView from './views/MainView';
 import NewDownloadView from './views/NewDownloadView';
-import {fetchDownloads} from './actions';
+import {fetchDownloads, resetNewDownloadViewState} from './actions';
 
 class App extends Component {
+
+  componentDidUpdate(prevProps) {
+    if (this.props.location.pathname !== prevProps.location.pathname) {
+      this.onRouteChanged();
+    }
+  }
+
+  onRouteChanged() {
+    console.log("ROUTE CHANGED:", this.props.location.pathname);
+    this.props.resetNewDownloadViewState();
+    switch (this.props.location.pathname) {
+      case '/all':
+        this.props.fetchDownloads('all');
+        break;
+      case '/downloading':
+        this.props.fetchDownloads('downloading');
+        break;
+      case '/finished':
+        this.props.fetchDownloads('finished');
+        break;
+      case '/new':
+        break;
+      default:
+        break;
+    }
+  }
+
   render() {
     return (
       <div style={{padding: '.5rem'}}>
@@ -37,4 +66,11 @@ class App extends Component {
   }
 }
 
-export default App;
+function mapDispatchToProps(dispatch) {
+    return bindActionCreators({
+      fetchDownloads,
+      resetNewDownloadViewState
+    }, dispatch);
+}
+
+export default withRouter(connect(null, mapDispatchToProps)(App));

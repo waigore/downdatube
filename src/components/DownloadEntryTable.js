@@ -18,14 +18,15 @@ class DownloadEntryTable extends React.Component {
   }
 
   componentDidMount() {
-    console.log("Fetching download entries on mount")
-    this.props.fetchDownloads(this.props.byStatus);
+    //console.log("Fetching download entries on mount")
+    //this.props.fetchDownloads(this.props.byStatus);
+
     console.log("Setting download progress background timer");
     this.timerId = setInterval(
       () => {
-        if (!this.props.downloads) {
+        /*if (!this.props.downloads) {
           return;
-        }
+        }*/
         let ids = this.props.downloads.items
           .filter(entry => entry.status != 'FINISHED')
           .map(entry => entry.id);
@@ -38,10 +39,12 @@ class DownloadEntryTable extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
+    console.log('componentWillReceiveProps', nextProps);
+    /*
     if (nextProps.byStatus && this.props.byStatus !== nextProps.byStatus) {
       console.log("Fetching download entries");
       nextProps.fetchDownloads(nextProps.byStatus);
-    }
+    }*/
   }
 
   componentWillUnmount() {
@@ -106,11 +109,11 @@ class DownloadEntryTable extends React.Component {
           <div>Loading...</div>
       );
     }
-    else if (this.props.downloads.items.length == 0) {
+    /*else if (this.props.downloads.items.length == 0) {
       return (
         <div>{"Nothing here. Click 'New' to start downing some Tube!"}</div>
       );
-    }
+    }*/
     return (
       <div>
         <Table>

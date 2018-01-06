@@ -1,9 +1,11 @@
 import {combineReducers} from 'redux';
 import moment from 'moment';
 import {
-  REQUEST_DOWNLOADS,
-  RECEIVE_DOWNLOADS,
-  RECEIVE_DOWNLOAD_PROGRESS
+  RESET_NEW_DOWNLOAD_VIEW_STATE,
+  DOWNLOADS_RECEIVED,
+  DOWNLOAD_PROGRESS_RECEIVED,
+  NEW_DOWNLOAD_CREATED,
+  NEW_DOWNLOAD_FAILED
 } from '../actions';
 
 const statusValues = {
@@ -52,13 +54,11 @@ const markDownloadItemFinished = function(items, finishedDownload) {
 
 const downloads = function(state = {items: []}, action) {
   switch (action.type) {
-    case REQUEST_DOWNLOADS:
-      return Object.assign({}, state);
-    case RECEIVE_DOWNLOADS:
+    case DOWNLOADS_RECEIVED:
       return Object.assign({}, state, {
         items: resetDownloadItems(action.data.items)
       });
-    case RECEIVE_DOWNLOAD_PROGRESS:
+    case DOWNLOAD_PROGRESS_RECEIVED:
       return Object.assign({}, state, {
         items: mergeDownloadItems(state.items, action.data.items)
       });
@@ -67,8 +67,34 @@ const downloads = function(state = {items: []}, action) {
   }
 }
 
+const newDownload = function(state = {status: "INITIAL", videoId: null, error: null}, action) {
+  switch (action.type) {
+    case RESET_NEW_DOWNLOAD_VIEW_STATE:
+      return Object.assign({}, state, {
+        status: "INITIAL",
+        videoId: null,
+        error: null
+      });
+    case NEW_DOWNLOAD_CREATED:
+      return Object.assign({}, state, {
+        status: "SUCCESS",
+        videoId: action.data.id,
+        error: null
+      });
+    case NEW_DOWNLOAD_FAILED:
+      return Object.assign({}, state, {
+        status: 'ERROR',
+        videoId: null,
+        error: action.data.error
+      });
+    default:
+      return state;
+  }
+}
+
 const appReducer = combineReducers({
-  downloads: downloads
+  downloads: downloads,
+  newDownload: newDownload
 });
 
 export default appReducer;

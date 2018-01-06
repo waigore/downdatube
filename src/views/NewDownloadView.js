@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
 import { Route, Redirect } from 'react-router-dom';
-import { Button, Form, FormGroup, Label, Input, FormText } from 'reactstrap';
-import {bindActionCreators} from 'redux';
-import {connect} from 'react-redux';
+import { Alert, Button, Form, FormGroup, Label, Input, FormText } from 'reactstrap';
+import { bindActionCreators } from 'redux';
+import { connect } from 'react-redux';
 
-import { newDownload, createNewDownload } from '../actions';
+import { createNewDownload } from '../actions';
 
 class NewDownloadView extends Component {
 
@@ -12,12 +12,11 @@ class NewDownloadView extends Component {
     super(props);
     this.state = {goBack: false, url: ""};
 
-    this.save = this.save.bind(this);
+    this.back = this.back.bind(this);
     this.saveAndAddAnother = this.saveAndAddAnother.bind(this);
   }
 
   componentDidMount() {
-    //this.setState({goBack: false});
   }
 
   saveAndAddAnother() {
@@ -25,8 +24,7 @@ class NewDownloadView extends Component {
     this.setState({url: ""});
   }
 
-  save() {
-    this.props.createNewDownload(this.state.url);
+  back() {
     this.setState({url:"", goBack: true});
   }
 
@@ -45,13 +43,24 @@ class NewDownloadView extends Component {
     return (
       <div>
         <h3>New Video</h3>
+        <div>
+          <Alert color="primary" isOpen={this.props.newDownload.status == "INITIAL"}>
+            Copy a video URL from Youtube to start download.
+          </Alert>
+          <Alert color="success" isOpen={this.props.newDownload.status == "SUCCESS"}>
+            {'Video queued with id=' + this.props.newDownload.videoId + '.'}
+          </Alert>
+          <Alert color="warning" isOpen={this.props.newDownload.status == "ERROR"}>
+            {this.props.newDownload.error || ' '}
+          </Alert>
+        </div>
         <Form>
           <FormGroup>
             <Label for="videoUrl">Url</Label>
             <Input name="url" id="videoUrl" placeholder="Video URL" value={this.state.url} onChange={evt => this.updateUrl(evt)}/>
           </FormGroup>
           <div>
-            <Button onClick={this.save}>Save</Button>
+            <Button onClick={this.back}>Back</Button>
             <Button onClick={this.saveAndAddAnother} color="primary">Save and add another</Button>
           </div>
         </Form>
@@ -60,10 +69,16 @@ class NewDownloadView extends Component {
   }
 }
 
+function mapStateToProps(state) {
+    return {
+        newDownload: state.newDownload
+    };
+}
+
 function mapDispatchToProps(dispatch) {
     return bindActionCreators({
       createNewDownload
     }, dispatch);
 }
 
-export default connect(null, mapDispatchToProps)(NewDownloadView);
+export default connect(mapStateToProps, mapDispatchToProps)(NewDownloadView);
