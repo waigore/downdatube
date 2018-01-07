@@ -85,7 +85,7 @@ const newDownload = function(state = {status: "INITIAL", videoId: null, error: n
       return Object.assign({}, state, {
         status: 'ERROR',
         videoId: null,
-        error: action.data.error
+        error: action.error.error
       });
     default:
       return state;

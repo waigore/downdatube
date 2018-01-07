@@ -3,6 +3,7 @@ import { Route, Redirect } from 'react-router-dom';
 import { Alert, Button, Form, FormGroup, Label, Input, FormText } from 'reactstrap';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
+import FaBeer from 'react-icons/lib/fa/beer';
 
 import { createNewDownload } from '../actions';
 
@@ -45,7 +46,7 @@ class NewDownloadView extends Component {
         <h3>New Video</h3>
         <div>
           <Alert color="primary" isOpen={this.props.newDownload.status == "INITIAL"}>
-            Copy a video URL from Youtube to start download.
+            Copy a video URL from Youtube to start download! <FaBeer />
           </Alert>
           <Alert color="success" isOpen={this.props.newDownload.status == "SUCCESS"}>
             {'Video queued with id=' + this.props.newDownload.videoId + '.'}

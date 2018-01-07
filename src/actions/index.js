@@ -80,8 +80,14 @@ export function createNewDownload(url) {
       },
       body: JSON.stringify({url})
     })
-    .then(response => response.json())
-    .then(json => dispatch(newDownloadCreated(json)))
+    .then(response => {
+      if (response.status == 400) {
+        response.json().then(j => dispatch(newDownloadFailed(j)));
+      }
+      else {
+        response.json().then(j => dispatch(newDownloadCreated(j)));
+      }
+    })
     .catch(error => {
       console.log('An error occurred.', error),
         dispatch(newDownloadFailed(error))
