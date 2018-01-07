@@ -2,31 +2,47 @@ import React from 'react';
 import Websocket from 'react-websocket';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
-import { Button, Col, Progress, Table } from 'reactstrap';
+import { Button, Container, Col, Progress, Row, Table } from 'reactstrap';
+import FaTimesCircle from 'react-icons/lib/fa/times-circle';
 import {
   requestDownloads,
   fetchDownloads,
-  fetchDownloadProgress
+  fetchDownloadProgress,
+  doRemoveDownload
 } from '../actions';
 
 let WS_ENDPOINT = 'ws://localhost:5000/';
+
+class RemoveRow extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.handleClick = this.handleClick.bind(this);
+  }
+
+  handleClick() {
+    this.props.removeHandler(this.props.value);
+  }
+
+  render() {
+    return (
+      <div onClick={this.handleClick}><FaTimesCircle /></div>
+    );
+  }
+}
 
 class DownloadEntryTable extends React.Component {
 
   constructor(props) {
     super(props);
+
+    this.removeRow = this.removeRow.bind(this);
   }
 
   componentDidMount() {
-    //console.log("Fetching download entries on mount")
-    //this.props.fetchDownloads(this.props.byStatus);
-
     console.log("Setting download progress background timer");
     this.timerId = setInterval(
       () => {
-        /*if (!this.props.downloads) {
-          return;
-        }*/
         let ids = this.props.downloads.items
           .filter(entry => entry.status != 'FINISHED')
           .map(entry => entry.id);
@@ -39,12 +55,6 @@ class DownloadEntryTable extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    console.log('componentWillReceiveProps', nextProps);
-    /*
-    if (nextProps.byStatus && this.props.byStatus !== nextProps.byStatus) {
-      console.log("Fetching download entries");
-      nextProps.fetchDownloads(nextProps.byStatus);
-    }*/
   }
 
   componentWillUnmount() {
@@ -71,16 +81,32 @@ class DownloadEntryTable extends React.Component {
     }
   }
 
+  removeRow(entry) {
+    console.log(entry);
+    this.props.doRemoveDownload(entry.id);
+  }
+
   renderStatus(downloadEntry) {
     switch (downloadEntry.status) {
       case 'INITIAL':
-      case 'QUEUED':
         return (
           <div>{this.formatStatus(downloadEntry.status)}</div>
         );
+      case 'QUEUED':
+        return (
+          <div>
+            {this.formatStatus(downloadEntry.status)}
+            <RemoveRow removeHandler={this.removeRow} value={downloadEntry}/>
+          </div>
+        );
       case 'DOWNLOADING':
         return (
-          <Progress animated value={downloadEntry.status_pct}></Progress>
+          <Container>
+            <Row>
+                <Col xs="6"><Progress animated value={downloadEntry.status_pct}></Progress></Col>
+                <Col><RemoveRow removeHandler={this.removeRow} value={downloadEntry}/></Col>
+            </Row>
+          </Container>
         );
       default:
         return (
@@ -144,7 +170,8 @@ function mapDispatchToProps(dispatch) {
     return bindActionCreators({
       requestDownloads,
       fetchDownloads,
-      fetchDownloadProgress
+      fetchDownloadProgress,
+      doRemoveDownload
     }, dispatch);
 }
 

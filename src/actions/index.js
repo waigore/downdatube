@@ -1,5 +1,3 @@
-//import fetch from 'cross-fetch';
-
 const API_ENDPOINT = 'http://localhost:5000/api';
 
 export const NEW_DOWNLOAD = 'NEW_DOWNLOAD';
@@ -64,6 +62,60 @@ export function downloadProgressReceived(json) {
     type: DOWNLOAD_PROGRESS_RECEIVED,
     data: json,
     receivedAt: Date.now()
+  }
+}
+
+export const REMOVE_DOWNLOAD = 'REMOVE_DOWNLOAD';
+export function removeDownload(videoId) {
+  return {
+    type: REMOVE_DOWNLOAD,
+    id: videoId
+  }
+}
+
+export const DOWNLOAD_REMOVED = 'DOWNLOAD_REMOVED';
+export function downloadRemoved(json) {
+  return {
+    type: DOWNLOAD_REMOVED,
+    data: json,
+    receivedAt: Date.now()
+  }
+}
+
+export const REMOVE_DOWNLOAD_FAILED = 'REMOVE_DOWNLOAD_FAILED';
+export function removeDownloadFailed(json) {
+  return {
+    type: REMOVE_DOWNLOAD_FAILED,
+    data: json,
+    receivedAt: Date.now()
+  }
+}
+
+export function doRemoveDownload(videoId) {
+  return (dispatch) => {
+    dispatch(removeDownload(videoId));
+
+    let apiUrl = `${API_ENDPOINT}/remove_download`;
+    return fetch(apiUrl, {
+      method: "POST",
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({id: videoId})
+    })
+    .then(response => {
+      if (response.status == 400) {
+        response.json().then(j => dispatch(removeDownloadFailed(j)));
+      }
+      else {
+        response.json().then(j => dispatch(downloadRemoved(j)));
+      }
+    })
+    .catch(error => {
+      console.log('An error occurred.', error),
+        dispatch(removeDownloadFailed(error))
+    });
   }
 }
 

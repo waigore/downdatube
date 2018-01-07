@@ -5,7 +5,9 @@ import {
   DOWNLOADS_RECEIVED,
   DOWNLOAD_PROGRESS_RECEIVED,
   NEW_DOWNLOAD_CREATED,
-  NEW_DOWNLOAD_FAILED
+  NEW_DOWNLOAD_FAILED,
+  DOWNLOAD_REMOVED,
+  REMOVE_DOWNLOAD_FAILED
 } from '../actions';
 
 const statusValues = {
@@ -32,6 +34,10 @@ const mergeDownloadItems = function(items, newItems) {
   let updatedItems = items.filter(item => !newItemIds.includes(item.id)).concat(newItems);
   sortDownloadItems(updatedItems);
   return updatedItems;
+}
+
+const removeDownloadItemById = function(items, videoId) {
+  return items.filter(item => item.id != videoId);
 }
 
 const resetDownloadItems = function(items) {
@@ -61,6 +67,12 @@ const downloads = function(state = {items: []}, action) {
     case DOWNLOAD_PROGRESS_RECEIVED:
       return Object.assign({}, state, {
         items: mergeDownloadItems(state.items, action.data.items)
+      });
+    case DOWNLOAD_REMOVED:
+      console.log("removed id:", action.data.id);
+      return Object.assign({}, state, {
+        items: state.items.filter(item => item.id != action.data.id)
+        //items: removeDownloadItemById(state.items, action.data.id)
       });
     default:
       return state;
