@@ -30,7 +30,7 @@ class AppNavbar extends Component {
     return (
       <div>
         <Navbar color="faded" light expand="md">
-          <NavbarBrand href="/">downdatube</NavbarBrand>
+          <NavbarBrand href="/">downdatube!</NavbarBrand>
           <NavbarToggler onClick={this.toggle} />
           <Collapse isOpen={this.state.isOpen} navbar>
             <Nav className="ml-auto" navbar>

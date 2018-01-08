@@ -15,6 +15,10 @@ import {fetchDownloads, resetNewDownloadViewState} from './actions';
 
 class App extends Component {
 
+  componentDidMount() {
+    document.title = "downdatube!";
+  }
+
   componentDidUpdate(prevProps) {
     if (this.props.location.pathname !== prevProps.location.pathname) {
       this.onRouteChanged();
