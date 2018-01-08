@@ -2,7 +2,8 @@ import React from 'react';
 import Websocket from 'react-websocket';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
-import { Button, Container, Col, Progress, Row, Table } from 'reactstrap';
+import moment from 'moment';
+import { Badge, Button, Container, Col, Progress, Row, Table } from 'reactstrap';
 import FaTimesCircle from 'react-icons/lib/fa/times-circle';
 import {
   requestDownloads,
@@ -62,6 +63,11 @@ class DownloadEntryTable extends React.Component {
     clearInterval(this.timerId);
   }
 
+  removeRow(entry) {
+    console.log(entry);
+    this.props.doRemoveDownload(entry.id);
+  }
+
   formatDownloadPct(pct) {
     return pct + "%";
   }
@@ -81,9 +87,23 @@ class DownloadEntryTable extends React.Component {
     }
   }
 
-  removeRow(entry) {
-    console.log(entry);
-    this.props.doRemoveDownload(entry.id);
+  renderName(downloadEntry) {
+    let queueDate = moment(downloadEntry.queueDate);
+    console.log("Queue Date:", queueDate);
+    let badgeColor = null;
+    let badgeText = null;
+    if (queueDate.dayOfYear() == moment().dayOfYear()) {
+      badgeColor = 'primary';
+      badgeText = 'today';
+    }
+    else {
+      badgeColor = 'light';
+      badgeText = queueDate.fromNow();
+    }
+
+    return (
+      <div><Badge color={badgeColor}>{badgeText}</Badge> {downloadEntry.name || '???'}</div>
+    );
   }
 
   renderStatus(downloadEntry) {
@@ -122,7 +142,7 @@ class DownloadEntryTable extends React.Component {
         <tr key={downloadEntry.id}>
           <th scope="row">{++i}</th>
           <td>{downloadEntry.uploader || '???'}</td>
-          <td>{downloadEntry.name || '???'}</td>
+          <td>{this.renderName(downloadEntry)}</td>
           <td>{this.renderStatus(downloadEntry)}</td>
         </tr>
       );
