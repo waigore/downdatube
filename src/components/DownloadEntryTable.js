@@ -3,7 +3,7 @@ import Websocket from 'react-websocket';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import moment from 'moment';
-import { Badge, Button, Container, Col, Progress, Row, Table } from 'reactstrap';
+import { Badge, Button, Container, Col, Progress, Row, Table, Tooltip } from 'reactstrap';
 import FaTimesCircle from 'react-icons/lib/fa/times-circle';
 import {
   requestDownloads,
@@ -37,10 +37,17 @@ class DownloadEntryTable extends React.Component {
   constructor(props) {
     super(props);
 
+    console.log("DownloadEntryTable()");
+
     this.removeRow = this.removeRow.bind(this);
+    this.toggleQueueDateTooltip = this.toggleQueueDateTooltip.bind(this);
+
+    this.state = {};
+    this.updateTooltipToggleStates(props.downloads.items);
   }
 
   componentDidMount() {
+    console.log("componentDidMount()");
     console.log("Setting download progress background timer");
     this.timerId = setInterval(
       () => {
@@ -53,14 +60,40 @@ class DownloadEntryTable extends React.Component {
       },
       2000
     );
+
+    this.updateTooltipToggleStates(this.props.downloads.items);
   }
 
   componentWillReceiveProps(nextProps) {
+    console.log("componentWillReceiveProps()", nextProps);
+
+    this.updateTooltipToggleStates(nextProps.downloads.items);
   }
 
   componentWillUnmount() {
+    console.log("componentWillUnmount()");
     console.log("Clearing download progress timer");
     clearInterval(this.timerId);
+  }
+
+  initTooltipToggleStates(downloadEntries) {
+    console.log("Initializing tooltip toggle states based on download list")
+
+  }
+
+  updateTooltipToggleStates(downloadEntries) {
+    console.log("Updating tooltip toggle states based on download list")
+    downloadEntries.map(entry => {
+      this.setState({
+        ['queueDateTooltipOpen_'+entry.dbId]: false
+      });
+    })
+  }
+
+  toggleQueueDateTooltip(entry) {
+    this.setState({
+      ['queueDateTooltipOpen_'+entry.dbId]: !this.state['queueDateTooltipOpen_'+entry.dbId]
+    })
   }
 
   removeRow(entry) {
@@ -89,7 +122,6 @@ class DownloadEntryTable extends React.Component {
 
   renderName(downloadEntry) {
     let queueDate = moment(downloadEntry.queueDate);
-    console.log("Queue Date:", queueDate);
     let badgeColor = null;
     let badgeText = null;
     if (queueDate.dayOfYear() == moment().dayOfYear()) {
@@ -102,7 +134,17 @@ class DownloadEntryTable extends React.Component {
     }
 
     return (
-      <div><Badge color={badgeColor}>{badgeText}</Badge> {downloadEntry.name || '???'}</div>
+      <div>
+        <Badge id={'queueDate_'+downloadEntry.dbId} color={badgeColor}>{badgeText}</Badge>
+        {downloadEntry.name || '???'}
+        <Tooltip
+            placement="top"
+            isOpen={this.state['queueDateTooltipOpen_'+downloadEntry.dbId]}
+            target={'queueDate_'+downloadEntry.dbId}
+            toggle={() => this.toggleQueueDateTooltip(downloadEntry)}>
+          {queueDate.fromNow()}
+        </Tooltip>
+      </div>
     );
   }
 
