@@ -11,6 +11,7 @@ import {
   fetchDownloadProgress,
   doRemoveDownload
 } from '../actions';
+import {truncate} from '../util';
 
 let WS_ENDPOINT = 'ws://localhost:5000/';
 
@@ -41,6 +42,7 @@ class DownloadEntryTable extends React.Component {
 
     this.removeRow = this.removeRow.bind(this);
     this.toggleQueueDateTooltip = this.toggleQueueDateTooltip.bind(this);
+    this.toggleDownloadPctTooltip = this.toggleDownloadPctTooltip.bind(this);
 
     this.state = {};
     this.updateTooltipToggleStates(props.downloads.items);
@@ -85,7 +87,8 @@ class DownloadEntryTable extends React.Component {
     console.log("Updating tooltip toggle states based on download list")
     downloadEntries.map(entry => {
       this.setState({
-        ['queueDateTooltipOpen_'+entry.dbId]: false
+        ['queueDateTooltipOpen_'+entry.dbId]: false,
+        ['downloadPctTooltipOpen_'+entry.dbId]: false
       });
     })
   }
@@ -93,7 +96,13 @@ class DownloadEntryTable extends React.Component {
   toggleQueueDateTooltip(entry) {
     this.setState({
       ['queueDateTooltipOpen_'+entry.dbId]: !this.state['queueDateTooltipOpen_'+entry.dbId]
-    })
+    });
+  }
+
+  toggleDownloadPctTooltip(entry) {
+    this.setState({
+      ['downloadPctTooltipOpen_'+entry.dbId]: !this.state['downloadPctTooltipOpen_'+entry.dbId]
+    });
   }
 
   removeRow(entry) {
@@ -133,10 +142,12 @@ class DownloadEntryTable extends React.Component {
       badgeText = queueDate.fromNow();
     }
 
+    let name = downloadEntry.name || '???';
+
     return (
       <div>
         <Badge id={'queueDate_'+downloadEntry.dbId} color={badgeColor}>{badgeText}</Badge>
-        {downloadEntry.name || '???'}
+        {name}
         <Tooltip
             placement="top"
             isOpen={this.state['queueDateTooltipOpen_'+downloadEntry.dbId]}
@@ -165,7 +176,16 @@ class DownloadEntryTable extends React.Component {
         return (
           <Container>
             <Row>
-                <Col xs="6"><Progress animated value={downloadEntry.status_pct}></Progress></Col>
+                <Col xs="6">
+                  <Progress id={'downloadPct_'+downloadEntry.dbId} animated value={downloadEntry.status_pct}></Progress>
+                  <Tooltip
+                      placement="top"
+                      isOpen={this.state['downloadPctTooltipOpen_'+downloadEntry.dbId]}
+                      target={'downloadPct_'+downloadEntry.dbId}
+                      toggle={() => this.toggleDownloadPctTooltip(downloadEntry)}>
+                    {this.formatDownloadPct(downloadEntry.status_pct)}
+                  </Tooltip>
+                </Col>
                 <Col><RemoveRow removeHandler={this.removeRow} value={downloadEntry}/></Col>
             </Row>
           </Container>
@@ -197,11 +217,11 @@ class DownloadEntryTable extends React.Component {
           <div>Loading...</div>
       );
     }
-    /*else if (this.props.downloads.items.length == 0) {
+    else if (this.props.downloads.items.length == 0) {
       return (
         <div>{"Nothing here. Click 'New' to start downing some Tube!"}</div>
       );
-    }*/
+    }
     return (
       <div>
         <Table>
