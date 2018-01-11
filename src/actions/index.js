@@ -13,7 +13,7 @@ export function newDownloadCreated(json) {
   return {
     type: NEW_DOWNLOAD_CREATED,
     data: json,
-    receiveAt: Date.now()
+    receivedAt: Date.now()
   }
 }
 
@@ -22,6 +22,23 @@ export function newDownloadFailed(error) {
   return {
     type: NEW_DOWNLOAD_FAILED,
     error: error
+  }
+}
+
+export const REDOWNLOAD = 'REDOWNLOAD';
+export function redownload(videoId) {
+  return {
+    type: REDOWNLOAD,
+    videoId: videoId
+  }
+}
+
+export const REDOWNLOAD_STARTED = 'REDOWNLOAD_STARTED'
+export function redownloadStarted(json) {
+  return {
+    type: REDOWNLOAD_STARTED,
+    data: json,
+    receivedAt: Date.now()
   }
 }
 
@@ -115,6 +132,34 @@ export function doRemoveDownload(videoId) {
     .catch(error => {
       console.log('An error occurred.', error),
         dispatch(removeDownloadFailed(error))
+    });
+  }
+}
+
+export function forceRedownload(videoId) {
+  return (dispatch) => {
+    dispatch(redownload(videoId));
+
+    let apiUrl = `${API_ENDPOINT}/force_redownload`;
+    return fetch(apiUrl, {
+      method: "POST",
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({videoId})
+    })
+    .then(response => {
+      if (response.status == 400) {
+        response.json().then(j => dispatch(newDownloadFailed(j)));
+      }
+      else {
+        response.json().then(j => dispatch(redownloadStarted(j)));
+      }
+    })
+    .catch(error => {
+      console.log('An error occurred.', error),
+        dispatch(newDownloadFailed(error))
     });
   }
 }

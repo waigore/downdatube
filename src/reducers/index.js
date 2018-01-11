@@ -6,6 +6,7 @@ import {
   DOWNLOAD_PROGRESS_RECEIVED,
   NEW_DOWNLOAD_CREATED,
   NEW_DOWNLOAD_FAILED,
+  REDOWNLOAD_STARTED,
   DOWNLOAD_REMOVED,
   REMOVE_DOWNLOAD_FAILED
 } from '../actions';
@@ -88,6 +89,7 @@ const newDownload = function(state = {status: "INITIAL", videoId: null, error: n
         error: null
       });
     case NEW_DOWNLOAD_CREATED:
+    case REDOWNLOAD_STARTED:
       return Object.assign({}, state, {
         status: "SUCCESS",
         videoId: action.data.id,
@@ -96,8 +98,7 @@ const newDownload = function(state = {status: "INITIAL", videoId: null, error: n
     case NEW_DOWNLOAD_FAILED:
       return Object.assign({}, state, {
         status: 'ERROR',
-        videoId: null,
-        error: action.error.error
+        error: action.error
       });
     default:
       return state;

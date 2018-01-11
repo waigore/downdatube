@@ -5,7 +5,7 @@ import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import FaBeer from 'react-icons/lib/fa/beer';
 
-import { createNewDownload } from '../actions';
+import { createNewDownload, forceRedownload } from '../actions';
 
 class NewDownloadView extends Component {
 
@@ -15,6 +15,7 @@ class NewDownloadView extends Component {
 
     this.back = this.back.bind(this);
     this.saveAndAddAnother = this.saveAndAddAnother.bind(this);
+    this.forceDownload = this.forceDownload.bind(this);
   }
 
   componentDidMount() {
@@ -29,10 +30,34 @@ class NewDownloadView extends Component {
     this.setState({url:"", goBack: true});
   }
 
+  forceDownload(videoId) {
+    console.log("Force download", videoId);
+    this.props.forceRedownload(videoId);
+    this.setState({url: ""});
+  }
+
   updateUrl(evt) {
     this.setState({
       url: evt.target.value
     });
+  }
+
+  renderErrorAlertContents() {
+    if (!this.props.newDownload || !this.props.newDownload.error) return '';
+    let error = this.props.newDownload.error;
+    switch(error.error) {
+      case 'VIDEO_URL_MALFORMED':
+      return error.errorMsg;
+      case 'VIDEO_ID_EXISTS':
+      return (
+        <div>
+          {error.errorMsg + '   '}
+          <Button outline color="primary" onClick={() => this.forceDownload(this.props.newDownload.error.videoId)}>Download Anyway</Button>
+        </div>
+      )
+      default:
+      return error.errorMsg;
+    }
   }
 
   render() {
@@ -52,7 +77,7 @@ class NewDownloadView extends Component {
             {'Video queued with id=' + this.props.newDownload.videoId + '.'}
           </Alert>
           <Alert color="warning" isOpen={this.props.newDownload.status == "ERROR"}>
-            {this.props.newDownload.error || ' '}
+            {this.renderErrorAlertContents()}
           </Alert>
         </div>
         <Form>
@@ -78,7 +103,8 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
     return bindActionCreators({
-      createNewDownload
+      createNewDownload,
+      forceRedownload
     }, dispatch);
 }
 
