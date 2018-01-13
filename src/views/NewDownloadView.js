@@ -22,6 +22,9 @@ class NewDownloadView extends Component {
   }
 
   saveAndAddAnother() {
+    if (this.state.url == "") {
+      return;
+    }
     this.props.createNewDownload(this.state.url);
     this.setState({url: ""});
   }

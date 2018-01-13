@@ -137,6 +137,10 @@ class DownloadEntryTable extends React.Component {
       badgeColor = 'primary';
       badgeText = 'today';
     }
+    else if (queueDate.dayOfYear() == moment().dayOfYear()-1) {
+      badgeColor = 'light';
+      badgeText = 'yesterday';
+    }
     else {
       badgeColor = 'light';
       badgeText = queueDate.fromNow();
@@ -219,7 +223,7 @@ class DownloadEntryTable extends React.Component {
     }
     else if (this.props.downloads.items.length == 0) {
       return (
-        <div>{"Nothing here. Click 'New' to start downing some Tube!"}</div>
+        <div>{"Nothing here. Paste some video URLs in the textbox above to start downing some Tube!"}</div>
       );
     }
     return (
