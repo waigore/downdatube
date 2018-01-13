@@ -5,20 +5,38 @@ import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import FaBeer from 'react-icons/lib/fa/beer';
 
+import NewDownloadErrorMsg from '../components/NewDownloadErrorMsg';
 import { createNewDownload, forceRedownload } from '../actions';
 
 class NewDownloadView extends Component {
 
   constructor(props) {
     super(props);
-    this.state = {goBack: false, url: ""};
+    this.state = {
+      goBack: false,
+      url: "",
+      initialAlertToggle: true,
+      successAlertToggle: false,
+      errorAlertToggle: false
+    };
 
+    this.dismissAllAlerts = this.dismissAllAlerts.bind(this);
+    this.resetAlerts = this.resetAlerts.bind(this);
     this.back = this.back.bind(this);
     this.saveAndAddAnother = this.saveAndAddAnother.bind(this);
     this.forceDownload = this.forceDownload.bind(this);
   }
 
-  componentDidMount() {
+  componentWillReceiveProps(nextProps) {
+    this.setState({
+      initialAlertToggle: nextProps.newDownload.status == 'INITIAL',
+      successAlertToggle: nextProps.newDownload.status == 'SUCCESS',
+      errorAlertToggle: nextProps.newDownload.status == 'ERROR'
+    });
+
+    setTimeout(() => {
+      this.resetAlerts();
+    }, 3000);
   }
 
   saveAndAddAnother() {
@@ -45,22 +63,24 @@ class NewDownloadView extends Component {
     });
   }
 
+  resetAlerts() {
+    this.setState({
+      initialAlertToggle: true,
+      successAlertToggle: false,
+      errorAlertToggle: false
+    });
+  }
+
+  dismissAllAlerts() {
+    this.setState({
+      initialAlertToggle: false,
+      successAlertToggle: false,
+      errorAlertToggle: false
+    });
+  }
+
   renderErrorAlertContents() {
-    if (!this.props.newDownload || !this.props.newDownload.error) return '';
-    let error = this.props.newDownload.error;
-    switch(error.error) {
-      case 'VIDEO_URL_MALFORMED':
-      return error.errorMsg;
-      case 'VIDEO_ID_EXISTS':
-      return (
-        <div>
-          {error.errorMsg + '   '}
-          <Button outline color="primary" onClick={() => this.forceDownload(this.props.newDownload.error.videoId)}>Download Anyway</Button>
-        </div>
-      )
-      default:
-      return error.errorMsg;
-    }
+    return (<NewDownloadErrorMsg error={this.props.newDownload.error} forceDownload={this.forceDownload} />);
   }
 
   render() {
@@ -73,15 +93,24 @@ class NewDownloadView extends Component {
       <div>
         <h3>New Video</h3>
         <div>
-          <Alert color="primary" isOpen={this.props.newDownload.status == "INITIAL"}>
-            Copy a video URL from Youtube to start download! <FaBeer />
-          </Alert>
-          <Alert color="success" isOpen={this.props.newDownload.status == "SUCCESS"}>
-            {'Video queued with id=' + this.props.newDownload.videoId + '.'}
-          </Alert>
-          <Alert color="warning" isOpen={this.props.newDownload.status == "ERROR"}>
-            {this.renderErrorAlertContents()}
-          </Alert>
+          {
+            this.props.newDownload.status == 'INITIAL' &&
+            <Alert color="primary" isOpen={this.state.initialAlertToggle} toggle={this.dismissAllAlerts}>
+              Copy a video URL from Youtube to start download! <FaBeer />
+            </Alert>
+          }
+          {
+            this.props.newDownload.status == 'SUCCESS' &&
+            <Alert color="success" isOpen={this.state.successAlertToggle} toggle={this.dismissAllAlerts}>
+              {'Video queued with id=' + this.props.newDownload.videoId + '.'}
+            </Alert>
+          }
+          {
+            this.props.newDownload.status == 'ERROR' &&
+            <Alert color="warning" isOpen={this.state.errorAlertToggle} toggle={this.dismissAllAlerts}>
+              {this.renderErrorAlertContents()}
+            </Alert>
+          }
         </div>
         <Form>
           <FormGroup>

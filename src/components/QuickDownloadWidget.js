@@ -3,22 +3,38 @@ import { Alert, Button, Container, Col, Label, Input, Row, UncontrolledAlert } f
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 
+import NewDownloadErrorMsg from './NewDownloadErrorMsg';
 import { createNewDownload, forceRedownload, fetchDownloads } from '../actions';
 
 class QuickDownloadWidget extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = {url: ""};
+    this.state = {
+      url: "",
+      successAlertToggle: false,
+      errorAlertToggle: false
+    };
 
+    this.dismissAllAlerts = this.dismissAllAlerts.bind(this);
     this.addDownload = this.addDownload.bind(this);
+    this.forceDownload = this.forceDownload.bind(this);
   }
 
   componentWillReceiveProps(nextProps) {
     console.log("downloadWidget.componentWillReceiveProps:", nextProps);
-    if (nextProps.status != 'INITIAL') {
+    if (nextProps.newDownload.status != 'INITIAL') {
       this.props.fetchDownloads(nextProps.refreshType);
     }
+
+    this.setState({
+      successAlertToggle: nextProps.newDownload.status == 'SUCCESS',
+      errorAlertToggle: nextProps.newDownload.status == 'ERROR'
+    });
+
+    setTimeout(() => {
+      this.dismissAllAlerts();
+    }, 3000);
   }
 
   forceDownload(videoId) {
@@ -41,23 +57,16 @@ class QuickDownloadWidget extends React.Component {
     });
   }
 
+  dismissAllAlerts() {
+    this.setState({
+      successAlertToggle: false,
+      errorAlertToggle: false
+    });
+  }
+
   /* TODO refactor into separate component so that you DRY!*/
   renderErrorAlertContents() {
-    if (!this.props.newDownload || !this.props.newDownload.error) return '';
-    let error = this.props.newDownload.error;
-    switch(error.error) {
-      case 'VIDEO_URL_MALFORMED':
-      return error.errorMsg;
-      case 'VIDEO_ID_EXISTS':
-      return (
-        <div>
-          {error.errorMsg + '   '}
-          <Button outline color="primary" onClick={() => this.forceDownload(this.props.newDownload.error.videoId)}>Download Anyway</Button>
-        </div>
-      )
-      default:
-      return error.errorMsg;
-    }
+    return (<NewDownloadErrorMsg error={this.props.newDownload.error} forceDownload={this.forceDownload} />);
   }
 
   renderAlerts() {
@@ -66,9 +75,9 @@ class QuickDownloadWidget extends React.Component {
       return (
         <Row>
           <Col>
-            <UncontrolledAlert color="success">
+            <Alert color="success" isOpen={this.state.successAlertToggle} toggle={this.dismissAllAlerts}>
             {'Video queued with id=' + this.props.newDownload.videoId + '.'}
-            </UncontrolledAlert>
+            </Alert>
           </Col>
         </Row>
       )
@@ -76,9 +85,9 @@ class QuickDownloadWidget extends React.Component {
       return (
         <Row>
           <Col>
-            <UncontrolledAlert color="warning">
+            <Alert color="warning" isOpen={this.state.errorAlertToggle} toggle={this.dismissAllAlerts}>
             {this.renderErrorAlertContents()}
-            </UncontrolledAlert>
+            </Alert>
           </Col>
         </Row>
       )
