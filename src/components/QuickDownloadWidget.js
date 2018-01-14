@@ -23,18 +23,19 @@ class QuickDownloadWidget extends React.Component {
 
   componentWillReceiveProps(nextProps) {
     console.log("downloadWidget.componentWillReceiveProps:", nextProps);
-    if (nextProps.newDownload.status != 'INITIAL') {
+    if (this.props.newDownload.status != nextProps.newDownload.status &&
+        nextProps.newDownload.status != 'INITIAL') {
       this.props.fetchDownloads(nextProps.refreshType);
+
+      this.setState({
+        successAlertToggle: nextProps.newDownload.status == 'SUCCESS',
+        errorAlertToggle: nextProps.newDownload.status == 'ERROR'
+      });
+
+      setTimeout(() => {
+        this.dismissAllAlerts();
+      }, 3000);
     }
-
-    this.setState({
-      successAlertToggle: nextProps.newDownload.status == 'SUCCESS',
-      errorAlertToggle: nextProps.newDownload.status == 'ERROR'
-    });
-
-    setTimeout(() => {
-      this.dismissAllAlerts();
-    }, 3000);
   }
 
   forceDownload(videoId) {
@@ -47,7 +48,13 @@ class QuickDownloadWidget extends React.Component {
     if (this.state.url == "") {
       return;
     }
-    this.props.createNewDownload(this.state.url);
+
+    console.log(this.props.appSettings);
+    //TODO obtain defaults from backend!
+    let downloadOpts = {
+      downloadAudio: this.props.appSettings.downloadAudio
+    }
+    this.props.createNewDownload(this.state.url, downloadOpts);
     this.setState({url: ""});
   }
 
@@ -118,7 +125,8 @@ class QuickDownloadWidget extends React.Component {
 
 function mapStateToProps(state) {
     return {
-        newDownload: state.newDownload
+        newDownload: state.newDownload,
+        appSettings: state.appSettings
     };
 }
 

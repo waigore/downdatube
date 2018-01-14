@@ -180,7 +180,7 @@ export function forceRedownload(videoId) {
   }
 }
 
-export function createNewDownload(url) {
+export function createNewDownload(url, downloadOpts) {
   return (dispatch) => {
     dispatch(newDownload(url));
 
@@ -191,7 +191,7 @@ export function createNewDownload(url) {
         'Accept': 'application/json',
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({url})
+      body: JSON.stringify({url, downloadOpts})
     })
     .then(response => {
       if (response.status == 400) {

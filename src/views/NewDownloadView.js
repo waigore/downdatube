@@ -43,7 +43,11 @@ class NewDownloadView extends Component {
     if (this.state.url == "") {
       return;
     }
-    this.props.createNewDownload(this.state.url);
+
+    let downloadOpts = {
+      downloadAudio: false
+    }
+    this.props.createNewDownload(this.state.url, downloadOpts);
     this.setState({url: ""});
   }
 

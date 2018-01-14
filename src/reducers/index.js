@@ -61,9 +61,13 @@ const markDownloadItemFinished = function(items, finishedDownload) {
 }
 
 const mapAppSettings = function(appSettingList) {
-  return {
+  console.log("Map app settings", appSettingList);
+
+  let newSettings = {
     downloadAudio: appSettingList.reduce(setting => setting.setting == 'DOWNLOAD_AUDIO').value == "true" ? true : false
   }
+  console.log("New settings", newSettings);
+  return newSettings;
 }
 
 const downloads = function(state = {items: []}, action) {
@@ -112,14 +116,12 @@ const newDownload = function(state = {status: "INITIAL", videoId: null, error: n
   }
 }
 
-const appSettings = function(state, action) {
+const appSettings = function(state = {downloadAudio: false}, action) {
   switch (action.type) {
     case APP_SETTINGS_RECEIVED:
-      return mapAppSettings(action.data.items);
+      return Object.assign({}, state, mapAppSettings(action.data.items));
     default:
-      return Object.assign({}, state, {
-        downloadAudio: false
-      });
+      return state;
   }
 }
 
