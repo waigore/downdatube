@@ -8,7 +8,8 @@ import {
   NEW_DOWNLOAD_FAILED,
   REDOWNLOAD_STARTED,
   DOWNLOAD_REMOVED,
-  REMOVE_DOWNLOAD_FAILED
+  REMOVE_DOWNLOAD_FAILED,
+  APP_SETTINGS_RECEIVED
 } from '../actions';
 
 const statusValues = {
@@ -59,6 +60,12 @@ const markDownloadItemFinished = function(items, finishedDownload) {
 
 }
 
+const mapAppSettings = function(appSettingList) {
+  return {
+    downloadAudio: appSettingList.reduce(setting => setting.setting == 'DOWNLOAD_AUDIO').value == "true" ? true : false
+  }
+}
+
 const downloads = function(state = {items: []}, action) {
   switch (action.type) {
     case DOWNLOADS_RECEIVED:
@@ -105,9 +112,21 @@ const newDownload = function(state = {status: "INITIAL", videoId: null, error: n
   }
 }
 
+const appSettings = function(state, action) {
+  switch (action.type) {
+    case APP_SETTINGS_RECEIVED:
+      return mapAppSettings(action.data.items);
+    default:
+      return Object.assign({}, state, {
+        downloadAudio: false
+      });
+  }
+}
+
 const appReducer = combineReducers({
   downloads: downloads,
-  newDownload: newDownload
+  newDownload: newDownload,
+  appSettings: appSettings
 });
 
 export default appReducer;

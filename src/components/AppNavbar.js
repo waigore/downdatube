@@ -11,6 +11,7 @@ import {
   DropdownToggle,
   DropdownMenu,
   DropdownItem } from 'reactstrap';
+import { Link } from 'react-router-dom';
 
 class AppNavbar extends Component {
   constructor(props) {
@@ -41,16 +42,9 @@ class AppNavbar extends Component {
                 <DropdownToggle nav caret>
                   Options
                 </DropdownToggle>
-                <DropdownMenu >
+                <DropdownMenu>
                   <DropdownItem>
-                    Option 1
-                  </DropdownItem>
-                  <DropdownItem>
-                    Option 2
-                  </DropdownItem>
-                  <DropdownItem divider />
-                  <DropdownItem>
-                    Reset
+                    <Link style={{ textDecoration: 'none', color: 'black'}} to="/dl_options">Download</Link>
                   </DropdownItem>
                 </DropdownMenu>
               </UncontrolledDropdown>

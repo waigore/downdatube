@@ -7,11 +7,17 @@ import {
 import {Switch, Route, Redirect, withRouter} from 'react-router-dom';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
+
 import AppNavbar from './components/AppNavbar';
 import AppActionBar from './components/AppActionBar';
 import MainView from './views/MainView';
 import NewDownloadView from './views/NewDownloadView';
-import {fetchDownloads, resetNewDownloadViewState} from './actions';
+import DownloadDefaultOptionsView from './views/DownloadDefaultOptionsView';
+import {
+  fetchDownloads,
+  fetchAppSettings,
+  resetNewDownloadViewState
+} from './actions';
 
 class App extends Component {
 
@@ -40,6 +46,8 @@ class App extends Component {
         break;
       case '/new':
         break;
+      case '/dl_options':
+        this.props.fetchAppSettings();
       default:
         break;
     }
@@ -62,6 +70,7 @@ class App extends Component {
                 <MainView viewType="finished" />
               }/>
               <Route exact path="/new" component={NewDownloadView} />
+              <Route exact path="/dl_options" component={DownloadDefaultOptionsView} />
               <Redirect from="/" to="/downloading"/>
             </Switch>
         </Container>
@@ -73,6 +82,7 @@ class App extends Component {
 function mapDispatchToProps(dispatch) {
     return bindActionCreators({
       fetchDownloads,
+      fetchAppSettings,
       resetNewDownloadViewState
     }, dispatch);
 }

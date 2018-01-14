@@ -108,6 +108,22 @@ export function removeDownloadFailed(json) {
   }
 }
 
+export const REQUEST_APP_SETTINGS = 'REQUEST_APP_SETTINGS';
+export function requestAppSettings() {
+  return {
+    type: REQUEST_APP_SETTINGS
+  }
+}
+
+export const APP_SETTINGS_RECEIVED = 'APP_SETTINGS_RECEIVED';
+export function appSettingsReceived(json) {
+  return {
+    type: APP_SETTINGS_RECEIVED,
+    data: json,
+    receivedAt: Date.now()
+  }
+}
+
 export function doRemoveDownload(videoId) {
   return (dispatch) => {
     dispatch(removeDownload(videoId));
@@ -222,6 +238,18 @@ export function fetchDownloadProgress(ids) {
     })
     .then(response => response.json())
     .then(json => dispatch(downloadProgressReceived(json)))
+    .catch(error => console.log('An error occurred.', error));
+  }
+}
+
+export function fetchAppSettings() {
+  return (dispatch) => {
+    dispatch(requestAppSettings());
+
+    let apiUrl = `${API_ENDPOINT}/settings/all`;
+    return fetch(apiUrl)
+    .then(response => response.json())
+    .then(j => dispatch(appSettingsReceived(j)))
     .catch(error => console.log('An error occurred.', error));
   }
 }
