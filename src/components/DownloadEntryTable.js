@@ -6,7 +6,7 @@ import moment from 'moment';
 import { Badge, Button, Container, Col, Progress, Row, Table, Tooltip } from 'reactstrap';
 import FaTimesCircle from 'react-icons/lib/fa/times-circle';
 import {
-  requestDownloads,
+  resetNewDownloadViewState,
   fetchDownloads,
   fetchDownloadProgress,
   doRemoveDownload
@@ -38,8 +38,6 @@ class DownloadEntryTable extends React.Component {
   constructor(props) {
     super(props);
 
-    console.log("DownloadEntryTable()");
-
     this.removeRow = this.removeRow.bind(this);
     this.toggleQueueDateTooltip = this.toggleQueueDateTooltip.bind(this);
     this.toggleDownloadPctTooltip = this.toggleDownloadPctTooltip.bind(this);
@@ -54,7 +52,7 @@ class DownloadEntryTable extends React.Component {
     this.timerId = setInterval(
       () => {
         let ids = this.props.downloads.items
-          .filter(entry => entry.status != 'FINISHED')
+          .filter(entry => entry.status != 'FINISHED' && entry.status != 'ERROR')
           .map(entry => entry.id);
         if (ids.length > 0) {
           this.props.fetchDownloadProgress(ids);
@@ -70,6 +68,16 @@ class DownloadEntryTable extends React.Component {
     console.log("componentWillReceiveProps()", nextProps);
 
     this.updateTooltipToggleStates(nextProps.downloads.items);
+
+
+    if (nextProps.newDownload.status != 'INITIAL')
+    {
+      console.log("Download entry table requests refresh!");
+      this.props.fetchDownloads(nextProps.byStatus);
+      this.props.resetNewDownloadViewState();
+    }
+
+
   }
 
   componentWillUnmount() {
@@ -248,13 +256,14 @@ class DownloadEntryTable extends React.Component {
 
 function mapStateToProps(state) {
     return {
-        downloads: state.downloads
+        downloads: state.downloads,
+        newDownload: state.newDownload
     };
 }
 
 function mapDispatchToProps(dispatch) {
     return bindActionCreators({
-      requestDownloads,
+      resetNewDownloadViewState,
       fetchDownloads,
       fetchDownloadProgress,
       doRemoveDownload

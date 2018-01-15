@@ -33,8 +33,8 @@ class App extends Component {
 
   onRouteChanged() {
     console.log("ROUTE CHANGED:", this.props.location.pathname);
-    this.props.resetNewDownloadViewState();
-    this.props.fetchAppSettings();
+    //this.props.resetNewDownloadViewState();
+    //this.props.fetchAppSettings();
     switch (this.props.location.pathname) {
       case '/all':
         this.props.fetchDownloads('all');

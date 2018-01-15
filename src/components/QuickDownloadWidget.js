@@ -4,7 +4,12 @@ import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 
 import NewDownloadErrorMsg from './NewDownloadErrorMsg';
-import { createNewDownload, forceRedownload, fetchDownloads } from '../actions';
+import {
+  createNewDownload,
+  forceRedownload,
+  fetchDownloads,
+  resetNewDownloadViewState
+} from '../actions';
 
 class QuickDownloadWidget extends React.Component {
 
@@ -25,7 +30,6 @@ class QuickDownloadWidget extends React.Component {
     console.log("downloadWidget.componentWillReceiveProps:", nextProps);
     if (this.props.newDownload.status != nextProps.newDownload.status &&
         nextProps.newDownload.status != 'INITIAL') {
-      this.props.fetchDownloads(nextProps.refreshType);
 
       this.setState({
         successAlertToggle: nextProps.newDownload.status == 'SUCCESS',
@@ -134,7 +138,8 @@ function mapDispatchToProps(dispatch) {
     return bindActionCreators({
       createNewDownload,
       forceRedownload,
-      fetchDownloads
+      fetchDownloads,
+      resetNewDownloadViewState
     }, dispatch);
 }
 

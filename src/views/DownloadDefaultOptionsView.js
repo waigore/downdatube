@@ -19,6 +19,7 @@ class DownloadDefaultOptionsView extends Component {
     this.setState({
       downloadAudio: false
     });
+    this.props.fetchAppSettings();
   }
 
 
