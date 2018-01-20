@@ -31,7 +31,8 @@ class NewDownloadView extends Component {
     this.setState({
       initialAlertToggle: nextProps.newDownload.status == 'INITIAL',
       successAlertToggle: nextProps.newDownload.status == 'SUCCESS',
-      errorAlertToggle: nextProps.newDownload.status == 'ERROR'
+      errorAlertToggle: nextProps.newDownload.status == 'ERROR',
+      newDownloadError: nextProps.newDownload.status == 'ERROR' && nextProps.newDownload.error
     });
 
     setTimeout(() => {
@@ -68,10 +69,10 @@ class NewDownloadView extends Component {
   }
 
   resetAlerts() {
+    let currErrorAlertToggle = this.state.errorAlertToggle;
     this.setState({
-      initialAlertToggle: true,
-      successAlertToggle: false,
-      errorAlertToggle: false
+      initialAlertToggle: !currErrorAlertToggle,
+      successAlertToggle: false
     });
   }
 
@@ -84,7 +85,7 @@ class NewDownloadView extends Component {
   }
 
   renderErrorAlertContents() {
-    return (<NewDownloadErrorMsg error={this.props.newDownload.error} forceDownload={this.forceDownload} />);
+    return (<NewDownloadErrorMsg error={this.state.newDownloadError} forceDownload={this.forceDownload} />);
   }
 
   render() {
@@ -98,19 +99,19 @@ class NewDownloadView extends Component {
         <h3>New Video</h3>
         <div>
           {
-            this.props.newDownload.status == 'INITIAL' &&
+            !this.state.successAlertToggle && !this.state.errorAlertToggle &&
             <Alert color="primary" isOpen={this.state.initialAlertToggle} toggle={this.dismissAllAlerts}>
               Copy a video URL from Youtube to start download! <FaBeer />
             </Alert>
           }
           {
-            this.props.newDownload.status == 'SUCCESS' &&
+            this.state.successAlertToggle &&
             <Alert color="success" isOpen={this.state.successAlertToggle} toggle={this.dismissAllAlerts}>
               {'Video queued with id=' + this.props.newDownload.videoId + '.'}
             </Alert>
           }
           {
-            this.props.newDownload.status == 'ERROR' &&
+            this.state.errorAlertToggle &&
             <Alert color="warning" isOpen={this.state.errorAlertToggle} toggle={this.dismissAllAlerts}>
               {this.renderErrorAlertContents()}
             </Alert>

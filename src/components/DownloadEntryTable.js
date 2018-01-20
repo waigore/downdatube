@@ -68,27 +68,12 @@ class DownloadEntryTable extends React.Component {
     console.log("componentWillReceiveProps()", nextProps);
 
     this.updateTooltipToggleStates(nextProps.downloads.items);
-
-
-    if (nextProps.newDownload.status != 'INITIAL')
-    {
-      console.log("Download entry table requests refresh!");
-      this.props.fetchDownloads(nextProps.byStatus);
-      this.props.resetNewDownloadViewState();
-    }
-
-
   }
 
   componentWillUnmount() {
     console.log("componentWillUnmount()");
     console.log("Clearing download progress timer");
     clearInterval(this.timerId);
-  }
-
-  initTooltipToggleStates(downloadEntries) {
-    console.log("Initializing tooltip toggle states based on download list")
-
   }
 
   updateTooltipToggleStates(downloadEntries) {

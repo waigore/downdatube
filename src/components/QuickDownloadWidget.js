@@ -28,16 +28,16 @@ class QuickDownloadWidget extends React.Component {
 
   componentWillReceiveProps(nextProps) {
     console.log("downloadWidget.componentWillReceiveProps:", nextProps);
-    if (this.props.newDownload.status != nextProps.newDownload.status &&
-        nextProps.newDownload.status != 'INITIAL') {
-
+    if (nextProps.newDownload.status != 'INITIAL') {
+      console.log("Setting success/error states for downloadWidget");
       this.setState({
         successAlertToggle: nextProps.newDownload.status == 'SUCCESS',
-        errorAlertToggle: nextProps.newDownload.status == 'ERROR'
+        errorAlertToggle: nextProps.newDownload.status == 'ERROR',
+        newDownloadError: nextProps.newDownload.status == 'ERROR' && nextProps.newDownload.error
       });
 
       setTimeout(() => {
-        this.dismissAllAlerts();
+        this.dismissSuccessAlert();
       }, 3000);
     }
   }
@@ -75,44 +75,51 @@ class QuickDownloadWidget extends React.Component {
     });
   }
 
-  /* TODO refactor into separate component so that you DRY!*/
-  renderErrorAlertContents() {
-    return (<NewDownloadErrorMsg error={this.props.newDownload.error} forceDownload={this.forceDownload} />);
+  dismissSuccessAlert() {
+    this.setState({
+      successAlertToggle: false
+    })
+  }
+
+  renderSuccessAlert() {
+    return (
+      <Alert color="success" isOpen={this.state.successAlertToggle} toggle={this.dismissAllAlerts}>
+      {'Video queued with id=' + this.props.newDownload.videoId + '.'}
+      </Alert>
+    )
+  }
+
+  renderErrorAlert() {
+    return (
+      <Alert color="warning" isOpen={this.state.errorAlertToggle} toggle={this.dismissAllAlerts}>
+        <NewDownloadErrorMsg error={this.state.newDownloadError} forceDownload={this.forceDownload} />
+      </Alert>
+    )
   }
 
   renderAlerts() {
-    switch (this.props.newDownload.status) {
-      case 'SUCCESS':
-      return (
-        <Row>
-          <Col>
-            <Alert color="success" isOpen={this.state.successAlertToggle} toggle={this.dismissAllAlerts}>
-            {'Video queued with id=' + this.props.newDownload.videoId + '.'}
-            </Alert>
-          </Col>
-        </Row>
-      )
-      case 'ERROR':
-      return (
-        <Row>
-          <Col>
-            <Alert color="warning" isOpen={this.state.errorAlertToggle} toggle={this.dismissAllAlerts}>
-            {this.renderErrorAlertContents()}
-            </Alert>
-          </Col>
-        </Row>
-      )
-    }
-
+    console.log("renderAlerts: newDownload.status=", this.props.newDownload.status);
+    console.log("renderAlerts: successAlertToggle", this.state.successAlertToggle);
+    console.log("renderAlerts: errorAlertToggle", this.state.errorAlertToggle);
+    return (
+      <div>
+        {this.state.successAlertToggle && this.renderSuccessAlert()}
+        {this.state.errorAlertToggle && this.renderErrorAlert()}
+      </div>
+    )
   }
 
   render() {
     return (
       <div style={{marginBottom: "10px"}}>
         <Container fluid>
-          {
-            this.props.newDownload.status != 'INITIAL' && this.renderAlerts()
-          }
+          <Row>
+            <Col>
+            {
+              this.renderAlerts()
+            }
+            </Col>
+          </Row>
           <Row>
             <Col xl="8">
               <Input name="url" id="videoUrl" placeholder="Paste video URL from Youtube here!" value={this.state.url} onChange={evt => this.updateUrl(evt)}/>

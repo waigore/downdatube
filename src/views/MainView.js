@@ -11,7 +11,10 @@ import FaRefresh from 'react-icons/lib/fa/refresh';
 import DownloadEntryTable from '../components/DownloadEntryTable';
 import QuickDownloadWidget from '../components/QuickDownloadWidget';
 
-import { fetchDownloads } from '../actions';
+import {
+  fetchDownloads,
+  resetNewDownloadViewState
+} from '../actions';
 
 class MainView extends Component {
 
@@ -24,6 +27,19 @@ class MainView extends Component {
   onRefreshClick() {
     console.log("Refresh clicked, fetching downloads!");
     this.props.fetchDownloads(this.props.viewType);
+  }
+
+  componentWillReceiveProps(nextProps) {
+    console.log("mainView.componentWillReceiveProps:", nextProps);
+    if (nextProps.newDownload.status != 'INITIAL') {
+      console.log("Download entry table requests refresh!");
+      this.props.fetchDownloads(this.props.viewType);
+
+      setTimeout(() => {
+        this.props.resetNewDownloadViewState();
+      }, 3000);
+
+    }
   }
 
   renderView() {
@@ -68,10 +84,17 @@ class MainView extends Component {
   }
 }
 
+function mapStateToProps(state) {
+  return {
+      newDownload: state.newDownload
+  };
+}
+
 function mapDispatchToProps(dispatch) {
     return bindActionCreators({
-      fetchDownloads
+      fetchDownloads,
+      resetNewDownloadViewState
     }, dispatch);
 }
 
-export default connect(null, mapDispatchToProps)(MainView);
+export default connect(mapStateToProps, mapDispatchToProps)(MainView);
