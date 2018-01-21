@@ -4,7 +4,10 @@ import { Alert, Button, Form, FormGroup, Label, Input, FormText } from 'reactstr
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 
-import { fetchAppSettings } from '../actions';
+import {
+  fetchAppSettings,
+  doSaveAppSettings
+} from '../actions';
 
 class DownloadDefaultOptionsView extends Component {
 
@@ -35,11 +38,14 @@ class DownloadDefaultOptionsView extends Component {
   }
 
   reset() {
-
+    setStateToProps(this.props);
   }
 
   save() {
     console.log("DOWNLOAD_AUDIO:", this.state.downloadAudio);
+    this.props.doSaveAppSettings({
+      downloadAudio: this.state.downloadAudio
+    });
   }
 
   render() {
@@ -75,7 +81,8 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
     return bindActionCreators({
-      fetchAppSettings
+      fetchAppSettings,
+      doSaveAppSettings
     }, dispatch);
 }
 

@@ -6,7 +6,11 @@ import { connect } from 'react-redux';
 import FaBeer from 'react-icons/lib/fa/beer';
 
 import NewDownloadErrorMsg from '../components/NewDownloadErrorMsg';
-import { createNewDownload, forceRedownload } from '../actions';
+import {
+  createNewDownload,
+  forceRedownload,
+  fetchAppSettings
+} from '../actions';
 
 class NewDownloadView extends Component {
 
@@ -40,7 +44,7 @@ class NewDownloadView extends Component {
       newDownloadError: nextProps.newDownload.status == 'ERROR' && nextProps.newDownload.error
     });
 
-    loadAppSettings(nextProps);
+    this.loadAppSettings(nextProps);
 
     setTimeout(() => {
       this.resetAlerts();

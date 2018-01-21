@@ -124,6 +124,23 @@ export function appSettingsReceived(json) {
   }
 }
 
+export const SAVE_APP_SETTINGS = 'SAVE_APP_SETTINGS';
+export function saveAppSettings(settings) {
+  return {
+    type: SAVE_APP_SETTINGS,
+    settings: settings
+  }
+}
+
+export const APP_SETTINGS_SAVED = 'APP_SETTINGS_SAVED';
+export function appSettingsSaved(json) {
+  return {
+    type: APP_SETTINGS_SAVED,
+    data: json,
+    receivedAt: Date.now()
+  }
+}
+
 export function doRemoveDownload(videoId) {
   return (dispatch) => {
     dispatch(removeDownload(videoId));
@@ -250,6 +267,25 @@ export function fetchAppSettings() {
     return fetch(apiUrl)
     .then(response => response.json())
     .then(j => dispatch(appSettingsReceived(j)))
+    .catch(error => console.log('An error occurred.', error));
+  }
+}
+
+export function doSaveAppSettings(settings) {
+  return (dispatch) => {
+    dispatch(saveAppSettings(settings));
+
+    let apiUrl = `${API_ENDPOINT}/settings/save`;
+    return fetch(apiUrl, {
+      method: "POST",
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({settings: settings})
+    })
+    .then(response => response.json())
+    .then(json => dispatch(appSettingsSaved(json)))
     .catch(error => console.log('An error occurred.', error));
   }
 }

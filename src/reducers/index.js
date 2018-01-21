@@ -9,7 +9,8 @@ import {
   REDOWNLOAD_STARTED,
   DOWNLOAD_REMOVED,
   REMOVE_DOWNLOAD_FAILED,
-  APP_SETTINGS_RECEIVED
+  APP_SETTINGS_RECEIVED,
+  APP_SETTINGS_SAVED
 } from '../actions';
 
 const statusValues = {
@@ -119,6 +120,8 @@ const newDownload = function(state = {status: "INITIAL", videoId: null, error: n
 const appSettings = function(state = {downloadAudio: false}, action) {
   switch (action.type) {
     case APP_SETTINGS_RECEIVED:
+      return Object.assign({}, state, mapAppSettings(action.data.items));
+    case APP_SETTINGS_SAVED:
       return Object.assign({}, state, mapAppSettings(action.data.items));
     default:
       return state;
