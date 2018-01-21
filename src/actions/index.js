@@ -152,7 +152,7 @@ export function doRemoveDownload(videoId) {
   }
 }
 
-export function forceRedownload(videoId) {
+export function forceRedownload(videoId, downloadOpts) {
   return (dispatch) => {
     dispatch(redownload(videoId));
 
@@ -163,7 +163,7 @@ export function forceRedownload(videoId) {
         'Accept': 'application/json',
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({videoId})
+      body: JSON.stringify({videoId, downloadOpts})
     })
     .then(response => {
       if (response.status == 400) {

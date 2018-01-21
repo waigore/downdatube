@@ -17,7 +17,8 @@ class NewDownloadView extends Component {
       url: "",
       initialAlertToggle: true,
       successAlertToggle: false,
-      errorAlertToggle: false
+      errorAlertToggle: false,
+      downloadAudio: false
     };
 
     this.dismissAllAlerts = this.dismissAllAlerts.bind(this);
@@ -27,6 +28,10 @@ class NewDownloadView extends Component {
     this.forceDownload = this.forceDownload.bind(this);
   }
 
+  componentWillMount() {
+    this.props.fetchAppSettings();
+  }
+
   componentWillReceiveProps(nextProps) {
     this.setState({
       initialAlertToggle: nextProps.newDownload.status == 'INITIAL',
@@ -34,6 +39,8 @@ class NewDownloadView extends Component {
       errorAlertToggle: nextProps.newDownload.status == 'ERROR',
       newDownloadError: nextProps.newDownload.status == 'ERROR' && nextProps.newDownload.error
     });
+
+    loadAppSettings(nextProps);
 
     setTimeout(() => {
       this.resetAlerts();
@@ -46,7 +53,7 @@ class NewDownloadView extends Component {
     }
 
     let downloadOpts = {
-      downloadAudio: false
+      downloadAudio: this.state.downloadAudio
     }
     this.props.createNewDownload(this.state.url, downloadOpts);
     this.setState({url: ""});
@@ -58,7 +65,10 @@ class NewDownloadView extends Component {
 
   forceDownload(videoId) {
     console.log("Force download", videoId);
-    this.props.forceRedownload(videoId);
+    let downloadOpts = {
+      downloadAudio: this.state.downloadAudio
+    }
+    this.props.forceRedownload(videoId, downloadOpts);
     this.setState({url: ""});
   }
 
@@ -82,6 +92,12 @@ class NewDownloadView extends Component {
       successAlertToggle: false,
       errorAlertToggle: false
     });
+  }
+
+  loadAppSettings(theProps) {
+    this.setState({
+      downloadAudio: theProps.appSettings.downloadAudio
+    })
   }
 
   renderErrorAlertContents() {
@@ -122,6 +138,15 @@ class NewDownloadView extends Component {
             <Label for="videoUrl">Url</Label>
             <Input name="url" id="videoUrl" placeholder="Video URL" value={this.state.url} onChange={evt => this.updateUrl(evt)}/>
           </FormGroup>
+          <FormGroup>
+            <Label>
+              <Input
+                type="checkbox"
+                checked={this.state.downloadAudio}
+                onChange={(evt) => this.setState({downloadAudio : !this.state.downloadAudio})} />{ ' ' }
+              Download audio along with video
+            </Label>
+          </FormGroup>
           <div>
             <Button onClick={this.back}>Back</Button>
             <Button onClick={this.saveAndAddAnother} color="primary">Save and add another</Button>
@@ -134,6 +159,7 @@ class NewDownloadView extends Component {
 
 function mapStateToProps(state) {
     return {
+        appSettings: state.appSettings,
         newDownload: state.newDownload
     };
 }
@@ -141,6 +167,7 @@ function mapStateToProps(state) {
 function mapDispatchToProps(dispatch) {
     return bindActionCreators({
       createNewDownload,
+      fetchAppSettings,
       forceRedownload
     }, dispatch);
 }

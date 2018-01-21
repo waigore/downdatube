@@ -44,7 +44,10 @@ class QuickDownloadWidget extends React.Component {
 
   forceDownload(videoId) {
     console.log("Force download", videoId);
-    this.props.forceRedownload(videoId);
+    let downloadOpts = {
+      downloadAudio: this.props.appSettings.downloadAudio
+    }
+    this.props.forceRedownload(videoId, downloadOpts);
     this.setState({url: ""});
   }
 

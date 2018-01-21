@@ -13,6 +13,7 @@ import QuickDownloadWidget from '../components/QuickDownloadWidget';
 
 import {
   fetchDownloads,
+  fetchAppSettings,
   resetNewDownloadViewState
 } from '../actions';
 
@@ -27,6 +28,10 @@ class MainView extends Component {
   onRefreshClick() {
     console.log("Refresh clicked, fetching downloads!");
     this.props.fetchDownloads(this.props.viewType);
+  }
+
+  componentWillMount() {
+    this.props.fetchAppSettings();
   }
 
   componentWillReceiveProps(nextProps) {
@@ -93,6 +98,7 @@ function mapStateToProps(state) {
 function mapDispatchToProps(dispatch) {
     return bindActionCreators({
       fetchDownloads,
+      fetchAppSettings,
       resetNewDownloadViewState
     }, dispatch);
 }
